@@ -15,13 +15,14 @@ from .diffusion.utils.nn import update_ema
 
 @dataclass
 class DiffusionConfig:
+    # Backbones
     bert_model_name: str = "bert-base-uncased"
     hidden_t_dim: int = 768
     hidden_dim: int = 768
     dropout: float = 0.1
 
     denoiser_use_fp32: bool = True
-    dtype: str = "fp32" 
+    dtype: str = "fp32"  # choices: "fp16", "bf16", "fp32"
 
     use_ema: bool = False
     ema_rate: float = 0.99
@@ -29,6 +30,7 @@ class DiffusionConfig:
     init_pretrained: str = "bert"
     learned_mean_embed: bool = False
 
+    # Diffusion 核心配置
     diffusion_steps: int = 1000
     noise_schedule: str = "cosine"
     timestep_respacing: str = ""
@@ -119,6 +121,8 @@ class ConceptDiffusion(nn.Module):
         else:
             self.denoiser = self.denoiser.to(dtype=self.compute_dtype)        
 
+        print(f"denoiser use dtype: {next(self.denoiser.parameters()).dtype}")
+
         self.ema_rate = config.ema_rate
         self.denoiser_ema = None
 
@@ -146,11 +150,18 @@ class ConceptDiffusion(nn.Module):
             for param in self.denoiser_ema.parameters():
                 param.requires_grad = False 
 
+            print(f"denoiser_ema (shadow model) created. dtype: {next(self.denoiser_ema.parameters()).dtype}")
+            print("[INFO] EMA parameters frozen.")
+        else:
+            print("[INFO] EMA is DISABLED for denoiser.")
+
         self.noise_schedule = None
         self.model_kwargs = {}
         self.model_fn = None
         self.dpm_solver = None
         self._dpm_solver_is_ema = False
+
+
 
     @torch.no_grad()
     def _get_generated_emb(self, pred_xstart, input_ids, input_mask):
@@ -184,6 +195,7 @@ class ConceptDiffusion(nn.Module):
         out_mask = ar < lengths.unsqueeze(1)
 
         return out, out_mask
+
 
     def forward(
         self,
@@ -223,6 +235,7 @@ class ConceptDiffusion(nn.Module):
 
         return loss, out, out_mask
 
+
     @torch.inference_mode()
     def sample(
         self,
@@ -241,6 +254,9 @@ class ConceptDiffusion(nn.Module):
         self.model_kwargs['input_attention_mask'] = attention_mask.to(model_device)
 
         if self.dpm_solver is None or not solver_is_correct_mode:
+            print(f"--- sampling... (Using {'EMA' if use_ema else 'LIVE'} weights) ---")
+            print(f"[DPM_Solver Init] Denoiser ({'EMA' if use_ema else 'LIVE'}) compute_dtype: {next(model_to_use.parameters()).dtype}")
+
             self.noise_schedule = NoiseScheduleVP(
                 schedule="discrete", 
                 betas=torch.from_numpy(self.diffusion.betas)
@@ -291,6 +307,9 @@ class ConceptDiffusion(nn.Module):
         return out, out_mask
     
     def update_ema(self):
+        """
+        Update EMA weights during training (补充稳健性优化)
+        """
         if not self.training or not self.config.use_ema or self.ema_rate <= 0 or self.denoiser_ema is None:
             return
         
@@ -299,7 +318,8 @@ class ConceptDiffusion(nn.Module):
         ema_rate = self.ema_rate
         
         target_dict = ema_denoiser.state_dict()
-        ignore_keys = ["layer_norm", ".bias", "norm"]
+        # 定义需要忽略的参数（根据你的模型结构调整，可选）
+        ignore_keys = ["layer_norm", ".bias", "norm"]  # 跳过LayerNorm和偏置项
 
         if hasattr(live_denoiser, "merge_adapter"):
             try:
@@ -308,6 +328,7 @@ class ConceptDiffusion(nn.Module):
                 source_dict = source_model.state_dict()
                 
                 for key, targ_param in target_dict.items():
+                    # 1. 跳过需要忽略的参数
                     if any(ignore_key in key for ignore_key in ignore_keys):
                         if key in source_dict or key.replace(".weight", ".base_layer.weight") in source_dict:
                             src_key = key.replace(".weight", ".base_layer.weight").replace(".bias", ".base_layer.bias")
@@ -315,6 +336,7 @@ class ConceptDiffusion(nn.Module):
                             targ_param.data.copy_(src_param.data)
                         continue
                     
+                    # 2. 跳过非浮点型/不可训练参数
                     if not targ_param.is_floating_point() or not targ_param.requires_grad:
                         continue
 
@@ -326,13 +348,14 @@ class ConceptDiffusion(nn.Module):
                         src_param = source_dict[key]
                     
                     if src_param is not None:
+                        # 3. 设备和dtype一致性检查
                         if targ_param.device != src_param.device:
                             targ_param = targ_param.to(src_param.device)
                         if targ_param.dtype != src_param.dtype:
                             src_param = src_param.to(targ_param.dtype)
-                        
+                        # 核心更新逻辑
                         targ_param.data.mul_(ema_rate).add_(src_param.data, alpha=1 - ema_rate)
-                        
+                        # 4. 强制冻结EMA参数
                         if targ_param.requires_grad:
                             targ_param.requires_grad = False
                         
@@ -341,22 +364,25 @@ class ConceptDiffusion(nn.Module):
         else:
             source_dict = live_denoiser.state_dict()
             for key, targ_param in target_dict.items():
+                # 1. 跳过需要忽略的参数
                 if any(ignore_key in key for ignore_key in ignore_keys):
                     if key in source_dict:
                         targ_param.data.copy_(source_dict[key].data)
                     continue
                 
+                # 2. 跳过非浮点型/不可训练参数
                 if not targ_param.is_floating_point() or not targ_param.requires_grad:
                     continue 
 
                 if key in source_dict:
                     src_param = source_dict[key]
+                    # 3. 设备和dtype一致性检查
                     if targ_param.device != src_param.device:
                         targ_param = targ_param.to(src_param.device)
                     if targ_param.dtype != src_param.dtype:
                         src_param = src_param.to(targ_param.dtype)
-                    
+                    # 核心更新逻辑
                     targ_param.data.mul_(ema_rate).add_(src_param.data, alpha=1 - ema_rate)
-                    
+                    # 4. 强制冻结EMA参数
                     if targ_param.requires_grad:
                         targ_param.requires_grad = False

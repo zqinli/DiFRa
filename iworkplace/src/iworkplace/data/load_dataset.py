@@ -111,7 +111,7 @@ def get_instruction_dataset(
 
         context       = (ex.get("context") or "").strip()
         qas_raw       = ex.get("qa") or ex.get("qas") or []
-        triples       = _only_triples(ex.get("knowledge_graph") or [])
+        triples       = _only_triples(ex.get("open_model_refiment_triples") or [])
         keywords_list = ex.get("keywords") or ex.get("keywords") or []
         topics_list   = ex.get("topics") or ex.get("topic") or []
 

@@ -3,9 +3,8 @@ This code started out as a PyTorch port of Ho et al's diffusion models:
 https://github.com/hojonathanho/diffusion/blob/1e0dceb3b3495bbe19116a5e1b3596cd0706c543/diffusion_tf/diffusion_utils_2.py
 
 Docstrings have been added, as well as DDIM sampling and a new collection of beta schedules.
-
-Modified based on the original implementation for this project.
 """
+
 import enum
 import math
 
@@ -632,12 +631,84 @@ class GaussianDiffusion:
 
         return {'pred_xprev':pred_prev, 'pred_xstart':pred_xstart}
 
+    # def training_losses_seq2seq(self, model, t, model_kwargs=None, noise=None):
+    #     """
+    #     Compute training losses for a single timestep.
+
+    #     :param model: the model to evaluate loss on.
+    #     :param x_start: the [N x C x ...] tensor of inputs. # not used unless fixing the input embeddings
+    #     :param t: a batch of timestep indices.
+    #     :param model_kwargs: if not None, a dict of extra keyword arguments to
+    #         pass to the model. This can be used for conditioning.
+    #     :param noise: if specified, the specific Gaussian noise to try to remove.
+    #     :return: a dict with the key "loss" containing a tensor of shape [N].
+    #              Some mean or variance settings may also have other keys.
+    #     """
+    #     assert 'input_ids' in model_kwargs
+    #     input_ids_x = model_kwargs.pop('input_ids').to(t.device)
+    #     input_ids_mask = model_kwargs.pop('input_mask').to(t.device)
+
+
+    #     # x_start_mean = model.model.module.get_embeds(input_ids_x)
+    #     x_start_mean = model.model.get_embeds(input_ids_x)
+        
+    #     std = _extract_into_tensor(self.sqrt_one_minus_alphas_cumprod,
+    #                                th.tensor([0]).to(x_start_mean.device),
+    #                                x_start_mean.shape)
+    #     x_start = self._get_x_start(x_start_mean, std)
+    #     if noise is None:
+    #         noise = th.randn_like(x_start)
+
+    #     x_t = self.q_sample(x_start, t, noise=noise, mask=input_ids_mask, mean_embed=model.mean_embed) # reparametrization trick.
+
+    #     # get_logits = model.model.module.get_logits
+    #     # get_logits = model.model.get_logits
+
+    #     terms = {}
+
+    #     target = x_start
+        
+    #     model_output = model(x_t, self._scale_timesteps(t), **model_kwargs)
+    #     assert model_output.shape == target.shape == x_start.shape
+    #     terms["mse"] = mean_flat((target - model_output) ** 2)
+
+    #     model_out_x_start = self._x0_helper(model_output, x_t, t)['pred_xstart'] # predicted_xstart = model_output
+
+    #     t0_mask = (t == 0)
+    #     t0_loss = mean_flat((x_start_mean - model_out_x_start) ** 2)
+    #     terms["mse"] = th.where(t0_mask, t0_loss, terms["mse"])
+
+    #     # out_mean, _, _ = self.q_mean_variance(x_start, th.LongTensor([self.num_timesteps - 1]).to(x_start.device))
+    #     # tT_loss =  mean_flat(out_mean ** 2)
+
+    #     # decoder_nll = self._token_discrete_loss(x_start, get_logits, input_ids_x) # embedding regularization
+    #     # terms["nll"] = self._token_discrete_loss(model_out_x_start, get_logits, input_ids_x, mask=input_ids_mask, truncate=True, t=t) # x_0->model_out_x_start
+
+    #     # terms["loss"] = terms["mse"] + decoder_nll + tT_loss
+    #     terms["loss"] = terms["mse"]
+
+    #     if model.mean_embed is not None:
+    #         terms["loss"] = terms["loss"] + self.reg_rate * model.mean_embed.norm(p=2).sum()
+            
+    #     terms["pred_xstart"] = model_out_x_start
+    #     # terms["loss"] = terms["mse"] + decoder_nll + tT_loss
+    #     # terms["loss"] = terms["mse"] # only use embedding loss
+
+    #     return terms
 
 
     def training_losses_seq2seq(self, model, t, model_kwargs=None, noise=None):
+        
         assert 'input_ids' in model_kwargs
         input_ids_x = model_kwargs.pop('input_ids').to(t.device)
+        
+        # 1. 获取噪音掩码 (x_input_mask) -> 用于 q_sample
+        #    (SRC=0, TRG=1, PAD=0)
         noise_mask = model_kwargs.pop('input_mask').to(t.device)
+        
+        # 2. 获取损失掩码 (x_input_attention_mask) -> 用于 MSE Loss
+        #    (SRC=1, TRG=1, PAD=0)
+        #    我们使用 .get() 而不是 .pop()，因为 model() 稍后也需要它
         loss_mask = model_kwargs.get('input_attention_mask').to(t.device)
         
         x_start_mean = model.model.get_embeds(input_ids_x)
@@ -649,31 +720,46 @@ class GaussianDiffusion:
         if noise is None:
             noise = th.randn_like(x_start)
 
+        # q_sample 使用 *噪音掩码* (noise_mask) 来锚定 SRC 和 PAD
         x_t = self.q_sample(x_start, t, noise=noise, mask=noise_mask, mean_embed=model.mean_embed) 
 
         terms = {}
         target = x_start
         
+        # model() 接收 **model_kwargs，其中仍包含 'input_attention_mask'
         model_output = model(x_t, self._scale_timesteps(t), **model_kwargs)
         assert model_output.shape == target.shape == x_start.shape
 
+        # --- 修正点：使用 loss_mask (即 attention_mask) 计算 Loss ---
+        
+        # 1. 计算所有位置的 MSE [B, L, H]
         mse_all = (target - model_output) ** 2
+        
+        # 2. 在 H 维度上取平均 [B, L]
         mse_per_token = mse_all.mean(dim=2)
+        
+        # 3. 应用 *损失掩码* (loss_mask)，保留 SRC 和 TRG 部分
         mse_masked = mse_per_token * loss_mask
+        
+        # 4. 计算每个样本的平均 loss (只除以有效 token 的数量)
         mse_loss_per_sample = mse_masked.sum(dim=1) / (loss_mask.sum(dim=1) + 1e-8)
         
         terms["mse"] = mse_loss_per_sample
+        # -----------------------------------------------
 
         model_out_x_start = self._x0_helper(model_output, x_t, t)['pred_xstart']
 
         t0_mask = (t == 0)
         
+        # --- t=0 时的 Loss 也需要使用 loss_mask ---
         t0_loss_all = (x_start_mean - model_out_x_start) ** 2
-        t0_loss_per_token = t0_loss_all.mean(dim=2)
-        t0_loss_masked = t0_loss_per_token * loss_mask
+        t0_loss_per_token = t0_loss_all.mean(dim=2) # [B, L]
+        t0_loss_masked = t0_loss_per_token * loss_mask # <-- 修正
         t0_loss = t0_loss_masked.sum(dim=1) / (loss_mask.sum(dim=1) + 1e-8)
+        # ------------------------------------
 
         terms["mse"] = th.where(t0_mask, t0_loss, terms["mse"])
+
         terms["loss"] = terms["mse"]
 
         if model.mean_embed is not None:
@@ -682,24 +768,38 @@ class GaussianDiffusion:
         terms["pred_xstart"] = model_out_x_start
         return terms
 
-def _extract_into_tensor(arr, timesteps, broadcast_shape):
-    """
-    Extract values from a 1-D numpy array for a batch of indices.
+# def _extract_into_tensor(arr, timesteps, broadcast_shape):
+#     """
+#     Extract values from a 1-D numpy array for a batch of indices.
 
-    :param arr: the 1-D numpy array.
-    :param timesteps: a tensor of indices into the array to extract.
-    :param broadcast_shape: a larger shape of K dimensions with the batch
-                            dimension equal to the length of timesteps.
-    :return: a tensor of shape [batch_size, 1, ...] where the shape has K dims.
-    """
-    if isinstance(arr, np.ndarray):
-        res = th.from_numpy(arr).to(device=timesteps.device)[timesteps].float()
+#     :param arr: the 1-D numpy array.
+#     :param timesteps: a tensor of indices into the array to extract.
+#     :param broadcast_shape: a larger shape of K dimensions with the batch
+#                             dimension equal to the length of timesteps.
+#     :return: a tensor of shape [batch_size, 1, ...] where the shape has K dims.
+#     """
+#     if isinstance(arr, np.ndarray):
+#         res = th.from_numpy(arr).to(device=timesteps.device)[timesteps].float()
+#     else:
+#         res = arr[timesteps].float()
+#     while len(res.shape) < len(broadcast_shape):
+#         res = res[..., None]
+#     return res.expand(broadcast_shape)
+def _extract_into_tensor(arr, timesteps, broadcast_shape):
+    import torch as th
+
+    if not th.is_tensor(arr):
+        arr = th.tensor(arr, dtype=th.float32, device=timesteps.device)
     else:
-        res = arr[timesteps].float()
+        arr = arr.to(device=timesteps.device)
+
+    timesteps = timesteps.to(arr.device).long().view(-1)
+    res = arr.index_select(0, timesteps).float()
+
     while len(res.shape) < len(broadcast_shape):
         res = res[..., None]
-    return res.expand(broadcast_shape)
 
+    return res.expand(broadcast_shape)
 
 def space_timesteps(num_timesteps, section_counts):
     """
@@ -771,6 +871,7 @@ class SpacedDiffusion(GaussianDiffusion):
         self.timestep_map = []
         self.original_num_steps = len(kwargs["betas"])
 
+        # print(kwargs.keys())
         base_diffusion = GaussianDiffusion(**kwargs)  # pylint: disable=missing-kwoa
         last_alpha_cumprod = 1.0
         new_betas = []

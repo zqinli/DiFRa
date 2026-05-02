@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "iworkplace"
+version = "0.1.0"
+description = "My Deep Learning Workplace"
+requires-python = ">=3.12"
+
+dependencies = [
+    "torch==2.10.0",
+    "torchvision",
+    "torchaudio",
+    "transformers==5.3.0",
+    "bitsandbytes==0.49.2",
+    "numpy>=1.24.0,<2.3.0",
+    "datasets==4.4.2",
+    "huggingface_hub==1.7.1",
+    "tyro==1.0.9",
+    "scipy==1.17.1",
+]
+
+[project.scripts]
+i-cli = "iworkplace.cli:main"
+
+[project.optional-dependencies]
+train = [
+    "accelerate==1.13.0",
+    "peft==0.18.1",
+    "trl==0.29.0",
+    "deepspeed==0.18.8",
+    "mpi4py",
+]
+
+ui = [
+    "gradio",
+]
+
+dev = [
+    "nvitop",
+    "gpustat",
+    "ruff",
+    "black",
+    "ipykernel",
+    "modelscope",
+    "nltk",
+    "rouge-score",
+    "bert-score",
+    "json_repair",
+    "openai",
+]
+
+all = [
+    "iworkplace[train,ui,dev]"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/iworkplace"]
