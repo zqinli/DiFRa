@@ -20,7 +20,7 @@ High-quality generated QA pairs should satisfy two requirements at the same time
 However, these two goals are naturally in tension: stronger semantic generalization can introduce factual errors, while overly conservative generation often lacks diversity. DiFRa addresses this challenge by combining **continuous concept diffusion** with **discrete knowledge graph constraints**.
 
 <p align="center">
-  <img src="assets/challenges.svg" width="75%" alt="Motivation of DiFRa">
+  <img src="assets/challenges.svg" width="60%" alt="Motivation of DiFRa">
 </p>
 
 <p align="center">
