@@ -1,7 +1,8 @@
 <div align="center">
 
-
 # DiFRa: A Unified Framework for Harmonizing Semantic Diversity and Factual Consistency in Question-Answer Generation
+
+</div>
 
 [![Paper](https://img.shields.io/badge/Paper-ACL_Anthology-firebrick.svg)](https://github.com/zqinli/DiFRa) [![PDF](https://img.shields.io/badge/PDF-Download-red.svg)](assets/DiFRa__ACL__conference__Camera_Ready.pdf) [![Code](https://img.shields.io/badge/Code-DiFRa-blue.svg)](https://github.com/zqinli/DiFRa) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
