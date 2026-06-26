@@ -26,6 +26,8 @@ However, these two goals are naturally in tension: stronger semantic generalizat
 <p align="center">
   <em>Figure 1: Motivation. DiFRa aims to generate QA pairs that are both semantically diverse and factually consistent.</em>
 </p>
+
+
 ---
 
 ## ✨ Key Features
