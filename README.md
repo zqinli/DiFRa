@@ -20,9 +20,8 @@ High-quality generated QA pairs should satisfy two requirements at the same time
 However, these two goals are naturally in tension: stronger semantic generalization can introduce factual errors, while overly conservative generation often lacks diversity. DiFRa addresses this challenge by combining **continuous concept diffusion** with **discrete knowledge graph constraints**.
 
 <p align="center">
-  <img src="assets/challenges.pdf" width="50%" alt="Motivation of DiFRa">
+  <img src="assets/challenges.svg" width="75%" alt="Motivation of DiFRa">
 </p>
-
 
 <p align="center">
   <em>Figure 1: Motivation. DiFRa aims to generate QA pairs that are both semantically diverse and factually consistent.</em>
@@ -48,8 +47,9 @@ However, these two goals are naturally in tension: stronger semantic generalizat
 ## 🧠 Framework
 
 <p align="center">
-  <img src="assets/overview.pdf" width="100%" alt="Overall architecture of DiFRa">
+  <img src="assets/overview.svg" width="100%" alt="Overall architecture of DiFRa">
 </p>
+
 
 
 <p align="center">
@@ -101,9 +101,12 @@ The official paper citation will be updated after publication.
 
 ## ⭐ Star Growth
 
-
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=zqinli/DiFRa&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=zqinli/DiFRa&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=zqinli/DiFRa&type=Date" />
-  </picture>
+<p align="center">
+  <a href="https://www.star-history.com/#zqinli/DiFRa&Date">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=zqinli/DiFRa&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=zqinli/DiFRa&type=Date" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=zqinli/DiFRa&type=Date" />
+    </picture>
+  </a>
+</p>
