@@ -10,7 +10,7 @@
 
 ## 📌 Overview
 
-**DiFRa** is a unified framework for **Question-Answer Generation (QAG)**. It is designed for domain-specific LLM post-training scenarios where high-quality QA data is scarce.
+**DiFRa** is a unified framework for **Question-Answer Generation (QAG)**. It is designed for alleviating the cold-start problem in  domain-specific LLM post-training scenarios where high-quality QA data is scarce.
 
 High-quality generated QA pairs should satisfy two requirements at the same time:
 
@@ -22,11 +22,9 @@ However, these two goals are naturally in tension: stronger semantic generalizat
 <p align="center">
   <img src="assets/challenges.svg" width="60%" alt="Motivation of DiFRa">
 </p>
-
 <p align="center">
-  <em>Figure 1: Motivation. DiFRa aims to generate QA pairs that are both semantically diverse and factually consistent.</em>
+  <em>Figure 1: Challenges. DiFRa aims to generate QA pairs that are both semantically diverse and factually consistent.</em>
 </p>
-
 
 ---
 
@@ -101,14 +99,10 @@ The official paper citation will be updated after publication.
 
 ---
 
-## ⭐ Star Growth
+## ⭐ Star History
 
-<p align="center">
-  <a href="https://www.star-history.com/#zqinli/DiFRa&Date">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=zqinli/DiFRa&type=Date&theme=dark" />
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=zqinli/DiFRa&type=Date" />
-      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=zqinli/DiFRa&type=Date" />
-    </picture>
-  </a>
-</p>
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&legend=top-left" />
+ </picture>
