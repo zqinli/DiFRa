@@ -4,9 +4,9 @@
 
 </div>
 
-[![Paper](https://img.shields.io/badge/Paper-ACL_Anthology-firebrick.svg)](https://github.com/zqinli/DiFRa) [![PDF](https://img.shields.io/badge/PDF-Download-red.svg)](assets/DiFRa__ACL__conference__Camera_Ready.pdf) [![Code](https://img.shields.io/badge/Code-DiFRa-blue.svg)](https://github.com/zqinli/DiFRa) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Paper](https://img.shields.io/badge/Paper-ACL_Anthology-firebrick.svg)](https://aclanthology.org/2026.findings-acl.1493)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
----
+
 
 ## 📌 Overview
 
@@ -20,7 +20,7 @@ High-quality generated QA pairs should satisfy two requirements at the same time
 However, these two goals are naturally in tension: stronger semantic generalization can introduce factual errors, while overly conservative generation often lacks diversity. DiFRa addresses this challenge by combining **continuous concept diffusion** with **discrete knowledge graph constraints**.
 
 <p align="center">
-  <img src="assets/challenges.svg" width="60%" alt="Motivation of DiFRa">
+  <img src="assets/challenges.svg" width="66%" alt="Motivation of DiFRa">
 </p>
 <p align="center">
   <em>Figure 1: Challenges. DiFRa aims to generate QA pairs that are both semantically diverse and factually consistent.</em>
@@ -83,19 +83,27 @@ bash examples/scripts/run.sh
 ---
 ## 📚 Citation
 
-If you find this repository useful, please cite our GitHub repository:
+If you find this work useful, please cite our paper:
 
-```
-@misc{li2025difra,
-  title        = {DiFRa: A Unified Framework for Harmonizing Semantic Diversity and Factual Consistency in Question-Answer Generation},
-  author       = {Li, Zhenqin and Ding, Shengyong and Li, Shuangyin},
-  year         = {2026},
-  howpublished = {\url{https://github.com/zqinli/DiFRa}},
-  note         = {GitHub repository}
+```bibtex
+@inproceedings{li-etal-2026-difra,
+    title = "{D}i{FR}a: A Unified Framework for Harmonizing Semantic Diversity and Factual Consistency in Question-Answer Generation",
+    author = "Li, Zhenqin and
+      Ding, ShengYong and
+      Li, Shuangyin",
+    booktitle = "Findings of the Association for Computational Linguistics: ACL 2026",
+    year = "2026",
+    address = "San Diego, California, United States",
+    publisher = "Association for Computational Linguistics",
+    pages = "29857--29875",
+    url = "https://aclanthology.org/2026.findings-acl.1493/"
 }
 ```
 
-The official paper citation will be updated after publication.
+
+## 🙏 Acknowledgement
+
+This project is partially inspired by the open-source project [DiffuSeq](https://github.com/Shark-NLP/DiffuSeq). We thank the authors for their valuable contribution.
 
 ---
 
