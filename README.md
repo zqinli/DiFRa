@@ -88,15 +88,22 @@ If you find this work useful, please cite our paper:
 ```bibtex
 @inproceedings{li-etal-2026-difra,
     title = "{D}i{FR}a: A Unified Framework for Harmonizing Semantic Diversity and Factual Consistency in Question-Answer Generation",
-    author = "Li, Zhenqin and
-      Ding, ShengYong and
+    author = "Li, Zhenqin  and
+      Ding, ShengYong  and
       Li, Shuangyin",
-    booktitle = "Findings of the Association for Computational Linguistics: ACL 2026",
+    editor = "Liakata, Maria  and
+      Moreira, Viviane P.  and
+      Zhang, Jiajun  and
+      Jurgens, David",
+    booktitle = "Findings of the {A}ssociation for {C}omputational {L}inguistics: {ACL} 2026",
+    month = jul,
     year = "2026",
     address = "San Diego, California, United States",
     publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2026.findings-acl.1493/",
+    doi = "10.18653/v1/2026.findings-acl.1493",
     pages = "29857--29875",
-    url = "https://aclanthology.org/2026.findings-acl.1493/"
+    ISBN = "979-8-89176-395-1"
 }
 ```
 
@@ -107,10 +114,12 @@ This project is partially inspired by the open-source project [DiffuSeq](https:/
 
 ---
 
-## ⭐ Star History
+## ⭐ ## Star History
 
+<a href="https://www.star-history.com/?repos=zqinli%2FDiFRa&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&theme=dark&legend=top-left&sealed_token=hY7WC7os2rlCe3lP3l3spPDNN_ZqV55NN1Ywjw0wZiJR6gDqXoOcxA8pInqR9qlVF0foTHBDzGC2KEOia83aU-YlULwON1Kp3ji-rtMndYkULiy66uc6Pg" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&legend=top-left&sealed_token=hY7WC7os2rlCe3lP3l3spPDNN_ZqV55NN1Ywjw0wZiJR6gDqXoOcxA8pInqR9qlVF0foTHBDzGC2KEOia83aU-YlULwON1Kp3ji-rtMndYkULiy66uc6Pg" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&legend=top-left&sealed_token=hY7WC7os2rlCe3lP3l3spPDNN_ZqV55NN1Ywjw0wZiJR6gDqXoOcxA8pInqR9qlVF0foTHBDzGC2KEOia83aU-YlULwON1Kp3ji-rtMndYkULiy66uc6Pg" />
  </picture>
+</a>
