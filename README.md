@@ -114,7 +114,7 @@ This project is partially inspired by the open-source project [DiffuSeq](https:/
 
 ---
 
-## ⭐ ## Star History
+## ⭐ Star History
 
 <a href="https://www.star-history.com/?repos=zqinli%2FDiFRa&type=date&legend=top-left">
  <picture>
