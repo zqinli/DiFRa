@@ -2,6 +2,12 @@ name: Generate Star History Chart
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/star_chart.yml"
+      - ".github/gen_star_chart.py"
   schedule:
     # Daily at 00:20 UTC. Change to "20 0 * * 0" for weekly Sunday runs.
     - cron: "20 0 * * *"
