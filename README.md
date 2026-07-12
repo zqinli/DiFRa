@@ -116,10 +116,8 @@ This project is partially inspired by the open-source project [DiffuSeq](https:/
 
 ## ⭐ Star History
 
-<a href="https://www.star-history.com/?repos=zqinli%2FDiFRa&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&theme=dark&legend=top-left&sealed_token=hY7WC7os2rlCe3lP3l3spPDNN_ZqV55NN1Ywjw0wZiJR6gDqXoOcxA8pInqR9qlVF0foTHBDzGC2KEOia83aU-YlULwON1Kp3ji-rtMndYkULiy66uc6Pg" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&legend=top-left&sealed_token=hY7WC7os2rlCe3lP3l3spPDNN_ZqV55NN1Ywjw0wZiJR6gDqXoOcxA8pInqR9qlVF0foTHBDzGC2KEOia83aU-YlULwON1Kp3ji-rtMndYkULiy66uc6Pg" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=zqinli/DiFRa&type=date&legend=top-left&sealed_token=hY7WC7os2rlCe3lP3l3spPDNN_ZqV55NN1Ywjw0wZiJR6gDqXoOcxA8pInqR9qlVF0foTHBDzGC2KEOia83aU-YlULwON1Kp3ji-rtMndYkULiy66uc6Pg" />
- </picture>
-</a>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/star_history_dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="assets/star_history_light.png">
+  <img alt="DiFRa Star History Chart" src="assets/star_history_light.png">
+</picture>
