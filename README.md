@@ -113,11 +113,3 @@ If you find this work useful, please cite our paper:
 This project is partially inspired by the open-source project [DiffuSeq](https://github.com/Shark-NLP/DiffuSeq). We thank the authors for their valuable contribution.
 
 ---
-
-## ⭐ Star History
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/star_history_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="assets/star_history_light.png">
-  <img alt="DiFRa Star History Chart" src="assets/star_history_light.png">
-</picture>
